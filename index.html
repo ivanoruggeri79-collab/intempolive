@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>intempolive</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    body {
+      margin: 0;
+      padding: 20px;
+      background-color: #f9f9f9;
+      color: #333;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    h1 {
+      color: #2c3e50;
+    }
+    .section {
+      background: white;
+      padding: 20px;
+      margin-bottom: 25px;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    input, textarea, button {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    button {
+      background: #3498db;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      border: none;
+    }
+    button:hover {
+      background: #2980b9;
+    }
+    .report-item {
+      border-bottom: 1px solid #eee;
+      padding: 15px 0;
+    }
+    .report-item:last-child {
+      border-bottom: none;
+    }
+    .report-media {
+      max-width: 100%;
+      height: auto;
+      margin: 10px 0;
+      border-radius: 6px;
+    }
+    .hidden {
+      display: none;
+    }
+    .status {
+      font-size: 0.9em;
+      color: #7f8c8d;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>intempolive</h1>
+      <p>Segnala, condividi, migliora la tua comunità</p>
+    </header>
+
+    <!-- LOGIN -->
+    <div id="login-section" class="section">
+      <h2>Accedi</h2>
+      <input type="email" id="email" placeholder="La tua email" value="cittadino@esempio.it" />
+      <button onclick="simulateLogin()">Accedi</button>
+    </div>
+
+    <!-- FORM SEGNALAZIONE (nascosto all'inizio) -->
+    <div id="report-form-section" class="section hidden">
+      <h2>Nuova segnalazione</h2>
+      <textarea id="description" placeholder="Descrivi il problema (es. buca, abusivismo, area da bonificare...)"></textarea>
+      <input type="file" id="media" accept="image/*,video/*" />
+      <button onclick="submitReport()">Invia segnalazione</button>
+      <p class="status">Le segnalazioni saranno pubblicate dopo moderazione.</p>
+    </div>
+
+    <!-- LISTA SEGNALAZIONI -->
+    <div id="reports-section" class="section">
+      <h2>Segnalazioni pubbliche</h2>
+      <div id="reports-list">
+        <!-- Simuliamo alcune segnalazioni esistenti -->
+        <div class="report-item">
+          <strong>Buca pericolosa in Via Roma</strong>
+          <p>Presente da oltre un mese, nessun intervento.</p>
+          <img src="https://placehold.co/400x200?text=Buca+in+Via+Roma" alt="Buca" class="report-media" />
+          <div>
+            <button onclick="vote(this)">👍 Vota (12)</button>
+            <button>💬 Commenta</button>
+            <button>🔗 Condividi</button>
+          </div>
+        </div>
+        <div class="report-item">
+          <strong>Occupazione abusiva marciapiede</strong>
+          <p>Tavolini di un bar invadono il passaggio pedonale.</p>
+          <img src="https://placehold.co/400x200?text=Marciapiede+occupato" alt="Abusivismo" class="report-media" />
+          <div>
+            <button onclick="vote(this)">👍 Vota (8)</button>
+            <button>💬 Commenta</button>
+            <button>🔗 Condividi</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function simulateLogin() {
+      const email = document.getElementById('email').value;
+      if (email && email.includes('@')) {
+        document.getElementById('login-section').classList.add('hidden');
+        document.getElementById('report-form-section').classList.remove('hidden');
+        alert('Accesso effettuato come ' + email);
+      } else {
+        alert('Inserisci un’email valida.');
+      }
+    }
+
+    function submitReport() {
+      const desc = document.getElementById('description').value.trim();
+      const fileInput = document.getElementById('media');
+      if (!desc) {
+        alert('Per favore, descrivi il problema.');
+        return;
+      }
+
+      // Simuliamo l'upload (non salviamo davvero)
+      const mediaPreview = fileInput.files.length > 0 ? 
+        URL.createObjectURL(fileInput.files[0]) : 
+        'https://placehold.co/400x200?text=Segnalazione+' + encodeURIComponent(desc.substring(0,20));
+
+      const reportDiv = document.createElement('div');
+      reportDiv.className = 'report-item';
+      reportDiv.innerHTML = `
+        <strong>Nuova segnalazione (in moderazione)</strong>
+        <p>${desc}</p>
+        <img src="${mediaPreview}" alt="Media" class="report-media" />
+        <div>
+          <button onclick="vote(this)">👍 Vota (0)</button>
+          <button>💬 Commenta</button>
+          <button>🔗 Condividi</button>
+        </div>
+      `;
+      document.getElementById('reports-list').prepend(reportDiv);
+
+      // Reset form
+      document.getElementById('description').value = '';
+      document.getElementById('media').value = '';
+
+      alert('Segnalazione inviata! Sarà visibile dopo approvazione.');
+    }
+
+    function vote(button) {
+      let text = button.innerText;
+      let count = parseInt(text.match(/\d+/)[0]) || 0;
+      count++;
+      button.innerText = `👍 Vota (${count})`;
+    }
+  </script>
+</body>
+</html>
