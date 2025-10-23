@@ -1,17 +1,38 @@
-<form action="/submit-contact" method="POST">
-  <h2>Contattaci</h2>
-  
-  <label for="nome">Nome *</label>
-  <input type="text" id="nome" name="nome" required>
+<form id="browser-feedback" action="/submit-feedback" method="POST" enctype="multipart/form-data">
+  <h2>Benvenuto nel nostro browser!</h2>
 
-  <label for="email">Email *</label>
-  <input type="email" id="email" name="email" required>
+  <!-- 1. Primo utilizzo / Registrazione -->
+  <fieldset>
+    <legend>Primo utilizzo? Registrati!</legend>
+    <label for="user-email">Email *</label>
+    <input type="email" id="user-email" name="user-email" required placeholder="email@esempio.com">
 
-  <label for="telefono">Telefono</label>
-  <input type="tel" id="telefono" name="telefono">
+    <label for="user-name">Nome (opzionale)</label>
+    <input type="text" id="user-name" name="user-name" placeholder="Il tuo nome">
 
-  <label for="messaggio">Messaggio *</label>
-  <textarea id="messaggio" name="messaggio" rows="5" required></textarea>
+    <label for="first-use">
+      <input type="checkbox" id="first-use" name="first-use" value="yes" checked>
+      Questo è il mio primo utilizzo
+    </label>
+  </fieldset>
 
-  <button type="submit">Invia</button>
+  <!-- 2. Segnalazione -->
+  <fieldset>
+    <legend>Segnala un problema o suggerisci un'idea</legend>
+    
+    <label for="issue-title">Titolo della segnalazione *</label>
+    <input type="text" id="issue-title" name="issue-title" required placeholder="Es: Il pulsante non risponde">
+
+    <label for="issue-comment">Descrizione dettagliata</label>
+    <textarea id="issue-comment" name="issue-comment" rows="5" placeholder="Spiega cosa è successo..."></textarea>
+  </fieldset>
+
+  <!-- 3. Upload immagine -->
+  <fieldset>
+    <legend>Allega uno screenshot (opzionale)</legend>
+    <label for="screenshot">Carica immagine (.png, .jpg, .jpeg)</label>
+    <input type="file" id="screenshot" name="screenshot" accept=".png,.jpg,.jpeg">
+  </fieldset>
+
+  <button type="submit">Invia segnalazione</button>
 </form>
