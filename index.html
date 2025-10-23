@@ -1,40 +1,290 @@
-<form id="validated-form" action="/submit-browser-issue" method="POST" enctype="multipart/form-data" novalidate>
-  <h2>Segnala un problema</h2>
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Segnala il tuo Comune</title>
+  <style>
+    :root {
+      --primary: #2c3e50;
+      --secondary: #3498db;
+      --accent: #e74c3c;
+      --light: #ecf0f1;
+      --dark: #2c3e50;
+      --shadow: 0 4px 12px rgba(0,0,0,0.1);
+      --radius: 12px;
+    }
 
-  <!-- Email con validazione -->
-  <label for="email">Email *</label>
-  <input type="email" id="email" name="email" required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" 
-         title="Inserisci un'email valida" placeholder="email@esempio.com">
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      color: white;
+      line-height: 1.6;
+    }
 
-  <!-- Titolo segnalazione -->
-  <label for="title">Titolo segnalazione *</label>
-  <input type="text" id="title" name="title" required minlength="3" maxlength="100"
-         placeholder="Breve descrizione del problema">
+    .container {
+      max-width: 800px;
+      margin: 30px auto;
+      padding: 30px;
+      background: rgba(255, 255, 255, 0.95);
+      color: #333;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+    }
 
-  <!-- Commento -->
-  <label for="comment">Dettagli del problema</label>
-  <textarea id="comment" name="comment" rows="5" maxlength="500"
-            placeholder="Cosa hai fatto? Cosa si aspettava? Cosa è successo?"></textarea>
+    h1 {
+      text-align: center;
+      color: var(--primary);
+      margin-bottom: 20px;
+      font-size: 2.2em;
+    }
 
-  <!-- Upload immagine con limiti -->
-  <label for="screenshot">Screenshot (opzionale - max 5MB)</label>
-  <input type="file" id="screenshot" name="screenshot" accept=".png,.jpg,.jpeg"
-         onchange="checkFileSize(this)">
+    .form-group {
+      margin-bottom: 20px;
+    }
 
-  <div id="file-error" style="color: red; display: none;">File troppo grande (massimo 5MB).</div>
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: var(--dark);
+    }
 
-  <button type="submit">Invia segnalazione</button>
-</form>
+    input, textarea, select {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: var(--radius);
+;
+      font-size: 16px;
+      transition: border-color 0.3s;
+    }
 
-<script>
-function checkFileSize(input) {
-  const maxSize = 5 * 1024 * 1024; // 5MB
-  const errorDiv = document.getElementById('file-error');
-  if (input.files[0] && input.files[0].size > maxSize) {
-    errorDiv.style.display = 'block';
-    input.value = ''; // Resetta il campo
-  } else {
-    errorDiv.style.display = 'none';
-  }
-}
-</script>
+    input:focus, textarea:focus, select:focus {
+      border-color: var(--secondary);
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+    }
+
+    button {
+      width: 100%;
+      padding: 15px;
+      background: var(--secondary);
+      color: white;
+      border: none;
+      border-radius: var(--radius);
+      font-size: 18px;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.2s;
+      font-weight: bold;
+    }
+
+    button:hover {
+      background: #2980b9;
+      transform: translateY(-2px);
+    }
+
+    .preview-container {
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    .preview-img {
+      max-width: 100%;
+      max-height: 300px;
+      border-radius: var(--radius);
+      border: 2px dashed #ccc;
+      display: none;
+    }
+
+    .preview-video {
+      max-width: 100%;
+      max-height: 300px;
+      border-radius: var(--radius);
+      display: none;
+    }
+
+    .location-info {
+      background: #f8f9fa;
+      padding: 15px;
+      border-radius: var(--radius);
+      margin-top: 10px;
+      font-size: 14px;
+      color: #555;
+    }
+
+    .btn-location {
+      background: var(--primary);
+      padding: 10px 15px;
+      border-radius: 20px;
+      font-size: 14px;
+      cursor: pointer;
+      margin-top: 10px;
+      display: inline-block;
+    }
+
+    .btn-location:hover {
+      background: #1a252f;
+    }
+
+    .social-preview {
+      margin-top: 30px;
+      padding: 20px;
+      background: #f1f1f1;
+      border-radius: var(--radius);
+      display: none;
+    }
+
+    .social-preview h3 {
+      margin-top: 0;
+      color: var(--primary);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>📍 Segnala il tuo Comune</h1>
+    <p style="text-align:center; margin-bottom: 30px;">Hai visto qualcosa da migliorare? Fai una foto, segnala il luogo e aiutaci a renderlo migliore!</p>
+
+    <form id="segnalazione-form" enctype="multipart/form-data">
+
+      <!-- 1. Titolo della segnalazione -->
+      <div class="form-group">
+        <label for="titolo">Titolo della segnalazione *</label>
+        <input type="text" id="titolo" name="titolo" required placeholder="Es: Panchina rotta in piazza XXIV Maggio">
+      </div>
+
+      <!-- 2. Descrizione -->
+      <div class="form-group">
+        <label for="descrizione">Descrizione dettagliata *</label>
+        <textarea id="descrizione" name="descrizione" rows="4" required placeholder="Cosa è successo? Quando? Cosa vorresti fosse fatto?"></textarea>
+      </div>
+
+      <!-- 3. Luogo (geolocalizzazione o manuale) -->
+      <div class="form-group">
+        <label for="luogo">Dove è accaduto?</label>
+        <input type="text" id="luogo" name="luogo" placeholder="Indirizzo, piazza, via..." required>
+        <button type="button" class="btn-location" onclick="getGeolocation()">📍 Usa la mia posizione</button>
+        <div class="location-info" id="location-info">Posizione non ancora rilevata.</div>
+      </div>
+
+      <!-- 4. Tipo di segnalazione -->
+      <div class="form-group">
+        <label for="tipo">Tipo di segnalazione</label>
+        <select id="tipo" name="tipo">
+          <option value="">Seleziona...</option>
+          <option value="strade">Strade / marciapiedi</option>
+          <option value="illuminazione">Illuminazione</option>
+          <option value="verde">Aree verdi / giardini</option>
+          <option value="spazzatura">Rifiuti / pulizia</option>
+          <option value="sicurezza">Sicurezza / videosorveglianza</option>
+          <option value="altro">Altro</option>
+        </select>
+      </div>
+
+      <!-- 5. Carica Foto o Video -->
+      <div class="form-group">
+        <label for="media">Carica una foto o un video *</label>
+        <input type="file" id="media" name="media" accept="image/*,video/*" required onchange="previewMedia(event)">
+        <div class="preview-container">
+          <img id="preview-img" class="preview-img" alt="Anteprima immagine">
+          <video id="preview-video" class="preview-video" controls></video>
+        </div>
+      </div>
+
+      <!-- 6. Dati utente (opzionali ma utili) -->
+      <div class="form-group">
+        <label for="nome">Il tuo nome (opzionale)</label>
+        <input type="text" id="nome" name="nome" placeholder="Come ti chiami?">
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email (opzionale - per contattarti)</label>
+        <input type="email" id="email" name="email" placeholder="email@esempio.com">
+      </div>
+
+      <!-- 7. Invia -->
+      <button type="submit">🚀 Invia Segnalazione</button>
+
+    </form>
+
+    <!-- Anteprima social (dopo approvazione) -->
+    <div class="social-preview" id="social-preview">
+      <h3>✅ La tua segnalazione sarà pubblicata su Social!</h3>
+      <p><strong>Titolo:</strong> <span id="preview-titolo"></span></p>
+      <p><strong>Luogo:</strong> <span id="preview-luogo"></span></p>
+      <p><strong>Descrizione:</strong> <span id="preview-descrizione"></span></p>
+      <div id="preview-media"></div>
+    </div>
+
+  </div>
+
+  <script>
+    // Funzione per ottenere la geolocalizzazione
+    function getGeolocation() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          function(position) {
+            const lat = position.coords.latitude;
+            const lng = position.coords.longitude;
+            document.getElementById('location-info').innerHTML = 
+              `📍 Posizione rilevata: Lat ${lat.toFixed(6)}, Lng ${lng.toFixed(6)}`;
+            // Opzionalmente, puoi usare API come Google Maps per convertire in indirizzo
+          },
+          function(error) {
+            alert("Impossibile ottenere la posizione: " + error.message);
+          }
+        );
+      } else {
+        alert("Geolocalizzazione non supportata dal browser.");
+      }
+    }
+
+    // Anteprima media (foto o video)
+    function previewMedia(event) {
+      const file = event.target.files[0];
+      const imgPreview = document.getElementById('preview-img');
+      const videoPreview = document.getElementById('preview-video');
+      
+      imgPreview.style.display = 'none';
+      videoPreview.style.display = 'none';
+
+      if (file) {
+        if (file.type.startsWith('image/')) {
+          imgPreview.src = URL.createObjectURL(file);
+          imgPreview.style.display = 'block';
+        } else if (file.type.startsWith('video/')) {
+          videoPreview.src = URL.createObjectURL(file);
+          videoPreview.style.display = 'block';
+        }
+      }
+    }
+
+    // Gestione invio form (simulazione)
+    document.getElementById('segnalazione-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      alert("✅ Segnalazione inviata! Sarà revisionata dall'amministrazione.");
+
+      // Mostra anteprima social (simulazione)
+      document.getElementById('preview-titolo').textContent = document.getElementById('titolo').value;
+      document.getElementById('preview-luogo').textContent = document.getElementById('luogo').value;
+      document.getElementById('preview-descrizione').textContent = document.getElementById('descrizione').value;
+
+      const media = document.getElementById('media').files[0];
+      if (media) {
+        if (media.type.startsWith('image/')) {
+          document.getElementById('preview-media').innerHTML = `<img src="${URL.createObjectURL(media)}" style="max-width:100%; border-radius:8px;">`;
+        } else if (media.type.startsWith('video/')) {
+          document.getElementById('preview-media').innerHTML = `<video controls style="max-width:100%; border-radius:8px;"><source src="${URL.createObjectURL(media)}"></video>`;
+        }
+      }
+
+      document.getElementById('social-preview').style.display = 'block';
+    });
+  </script>
+</body>
+</html>
