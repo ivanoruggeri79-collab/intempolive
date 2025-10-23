@@ -208,7 +208,7 @@
       </div>
 
       <!-- 7. Invia -->
-      <button type="submit">🚀 Invia Segnalazione</button>
+      <button type="button" onclick="inviaSegnalazione()">🚀 Invia Segnalazione</button>
 
     </form>
 
@@ -286,5 +286,45 @@
       document.getElementById('social-preview').style.display = 'block';
     });
   </script>
+  <script>
+async function inviaSegnalazione() {
+  const formData = new FormData(document.getElementById('segnalazione-form'));
+
+  try {
+    const response = await fetch('submit.php', {
+      method: 'POST',
+      body: formData
+    });
+
+    const result = await response.json();
+
+    if (result.success) {
+      alert(result.message);
+      
+      // Mostra anteprima social
+      document.getElementById('preview-titolo').textContent = document.getElementById('titolo').value;
+      document.getElementById('preview-luogo').textContent = document.getElementById('luogo').value;
+      document.getElementById('preview-descrizione').textContent = document.getElementById('descrizione').value;
+
+      const media = document.getElementById('media').files[0];
+      if (media) {
+        if (media.type.startsWith('image/')) {
+          document.getElementById('preview-media').innerHTML = `<img src="${URL.createObjectURL(media)}" style="max-width:100%; border-radius:8px;">`;
+        } else if (media.type.startsWith('video/')) {
+          document.getElementById('preview-media').innerHTML = `<video controls style="max-width:100%; border-radius:8px;"><source src="${URL.createObjectURL(media)}"></video>`;
+        }
+      }
+
+      document.getElementById('social-preview').style.display = 'block';
+
+    } else {
+      alert('Errore: ' + result.message);
+    }
+
+  } catch (error) {
+    alert('Errore di rete: ' + error.message);
+  }
+}
+</script>
 </body>
 </html>
