@@ -1,38 +1,40 @@
-<form id="browser-feedback" action="/submit-feedback" method="POST" enctype="multipart/form-data">
-  <h2>Benvenuto nel nostro browser!</h2>
+<form id="validated-form" action="/submit-browser-issue" method="POST" enctype="multipart/form-data" novalidate>
+  <h2>Segnala un problema</h2>
 
-  <!-- 1. Primo utilizzo / Registrazione -->
-  <fieldset>
-    <legend>Primo utilizzo? Registrati!</legend>
-    <label for="user-email">Email *</label>
-    <input type="email" id="user-email" name="user-email" required placeholder="email@esempio.com">
+  <!-- Email con validazione -->
+  <label for="email">Email *</label>
+  <input type="email" id="email" name="email" required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" 
+         title="Inserisci un'email valida" placeholder="email@esempio.com">
 
-    <label for="user-name">Nome (opzionale)</label>
-    <input type="text" id="user-name" name="user-name" placeholder="Il tuo nome">
+  <!-- Titolo segnalazione -->
+  <label for="title">Titolo segnalazione *</label>
+  <input type="text" id="title" name="title" required minlength="3" maxlength="100"
+         placeholder="Breve descrizione del problema">
 
-    <label for="first-use">
-      <input type="checkbox" id="first-use" name="first-use" value="yes" checked>
-      Questo è il mio primo utilizzo
-    </label>
-  </fieldset>
+  <!-- Commento -->
+  <label for="comment">Dettagli del problema</label>
+  <textarea id="comment" name="comment" rows="5" maxlength="500"
+            placeholder="Cosa hai fatto? Cosa si aspettava? Cosa è successo?"></textarea>
 
-  <!-- 2. Segnalazione -->
-  <fieldset>
-    <legend>Segnala un problema o suggerisci un'idea</legend>
-    
-    <label for="issue-title">Titolo della segnalazione *</label>
-    <input type="text" id="issue-title" name="issue-title" required placeholder="Es: Il pulsante non risponde">
+  <!-- Upload immagine con limiti -->
+  <label for="screenshot">Screenshot (opzionale - max 5MB)</label>
+  <input type="file" id="screenshot" name="screenshot" accept=".png,.jpg,.jpeg"
+         onchange="checkFileSize(this)">
 
-    <label for="issue-comment">Descrizione dettagliata</label>
-    <textarea id="issue-comment" name="issue-comment" rows="5" placeholder="Spiega cosa è successo..."></textarea>
-  </fieldset>
-
-  <!-- 3. Upload immagine -->
-  <fieldset>
-    <legend>Allega uno screenshot (opzionale)</legend>
-    <label for="screenshot">Carica immagine (.png, .jpg, .jpeg)</label>
-    <input type="file" id="screenshot" name="screenshot" accept=".png,.jpg,.jpeg">
-  </fieldset>
+  <div id="file-error" style="color: red; display: none;">File troppo grande (massimo 5MB).</div>
 
   <button type="submit">Invia segnalazione</button>
 </form>
+
+<script>
+function checkFileSize(input) {
+  const maxSize = 5 * 1024 * 1024; // 5MB
+  const errorDiv = document.getElementById('file-error');
+  if (input.files[0] && input.files[0].size > maxSize) {
+    errorDiv.style.display = 'block';
+    input.value = ''; // Resetta il campo
+  } else {
+    errorDiv.style.display = 'none';
+  }
+}
+</script>
