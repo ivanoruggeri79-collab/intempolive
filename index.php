@@ -21,19 +21,25 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
     <html lang="it">
     <head>
         <meta charset="UTF-8">
-        <title>Login Amministratore</title>
+        <title>Login Amministratore — Paesio</title>
         <style>
             body { font-family: Arial, sans-serif; background: #f5f5f5; padding: 20px; }
             .login-box { max-width: 400px; margin: 100px auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
             input[type="password"] { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 5px; }
-            button { width: 100%; padding: 12px; background: #2c3e50; color: white; border: none; border-radius: 5px; cursor: pointer; }
-            button:hover { background: #1a252f; }
+            button { width: 100%; padding: 12px; background: #00643C; color: white; border: none; border-radius: 5px; cursor: pointer; }
+            button:hover { background: #004d2c; }
             .error { color: red; text-align: center; margin-bottom: 15px; }
+            .logo-login {
+                width: 80px;
+                display: block;
+                margin: 0 auto 20px;
+            }
         </style>
     </head>
     <body>
         <div class="login-box">
-            <h2>🔒 Accesso Amministratore</h2>
+            <img src="https://ivanoruggeri79-collab.github.io/intempolive/logo.png" alt="Logo Paesio" class="logo-login">
+            <h2>🔒 Accesso Amministratore — Paesio</h2>
             <?php if (isset($error)) echo "<div class='error'>$error</div>"; ?>
             <form method="POST">
                 <input type="password" name="password" placeholder="Inserisci password" required>
@@ -53,7 +59,7 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <title>Pannello Amministratore - Segnala il tuo Comune</title>
+    <title>Pannello Amministratore — Paesio</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -68,14 +74,21 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
             padding: 20px;
         }
         header {
-            background: #2c3e50;
+            background: #00643C;
             color: white;
             padding: 20px;
             text-align: center;
             border-radius: 10px 10px 0 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+        .logo-header {
+            width: 60px;
         }
         .nav {
-            background: #34495e;
+            background: #004d2c;
             padding: 15px;
             display: flex;
             justify-content: space-between;
@@ -88,7 +101,7 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
             border-radius: 5px;
         }
         .nav a:hover {
-            background: #2c3e50;
+            background: #00331a;
         }
         .logout {
             background: #e74c3c;
@@ -112,12 +125,12 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
         }
         .stat-box h3 {
             margin: 0 0 10px 0;
-            color: #2c3e50;
+            color: #00643C;
         }
         .stat-box .number {
             font-size: 2em;
             font-weight: bold;
-            color: #3498db;
+            color: #28A745;
         }
         table {
             width: 100%;
@@ -133,7 +146,7 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
             border-bottom: 1px solid #eee;
         }
         th {
-            background: #3498db;
+            background: #28A745;
             color: white;
         }
         tr:hover {
@@ -202,19 +215,19 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
         }
         .filter-form button {
             padding: 8px 15px;
-            background: #2c3e50;
+            background: #00643C;
             color: white;
             border: none;
             border-radius: 5px;
             cursor: pointer;
         }
         .filter-form button:hover {
-            background: #1a252f;
+            background: #004d2c;
         }
         footer {
             text-align: center;
             padding: 20px;
-            background: #2c3e50;
+            background: #00643C;
             color: white;
             margin-top: 30px;
             border-radius: 0 0 10px 10px;
@@ -224,20 +237,20 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
 <body>
     <div class="container">
         <header>
-            <h1>📋 Pannello Amministratore</h1>
-            <p>Gestisci le segnalazioni dei cittadini</p>
+            <img src="https://ivanoruggeri79-collab.github.io/intempolive/logo.png" alt="Logo Paesio" class="logo-header">
+            <h1>📋 Pannello Amministratore — Paesio</h1>
         </header>
 
         <div class="nav">
             <span>Bentornato, Amministratore!</span>
-            <a href="index.php" class="logout">Logout</a>
+            <a href="index.php?logout" class="logout">Logout</a>
         </div>
 
         <!-- Statistiche -->
         <div class="stats">
             <?php
             try {
-                $pdo = new PDO("mysql:host=localhost;dbname=comune_segnalazioni;charset=utf8mb4", 'root', '');
+                $pdo = new PDO("mysql:host=mysql.altervista.org;dbname=NOME_TUO_DB;charset=utf8mb4", 'UTENTE_TUO', 'PASSWORD_TUA');
                 $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
                 $stmt = $pdo->query("SELECT COUNT(*) as total FROM segnalazioni");
@@ -359,7 +372,7 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
         </table>
 
         <footer>
-            <p>© 2025 Segnala il tuo Comune — Pannello Amministratore</p>
+            <p>© 2025 Paesio — Pannello Amministratore</p>
         </footer>
     </div>
 </body>
