@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Segnala il tuo Comune</title>
+  <title>Paesio — Segnala il tuo Comune</title>
   <style>
     :root {
-      --primary: #2c3e50;
-      --secondary: #3498db;
-      --accent: #e74c3c;
-      --light: #ecf0f1;
-      --dark: #2c3e50;
+      --primary-dark: #00643C;
+      --primary-light: #28A745;
+      --accent: #FF6B6B;
+      --light: #F8F9FA;
+      --white: #FFFFFF;
       --shadow: 0 4px 12px rgba(0,0,0,0.1);
       --radius: 12px;
     }
@@ -38,9 +38,26 @@
 
     h1 {
       text-align: center;
-      color: var(--primary);
-      margin-bottom: 20px;
+      color: var(--primary-dark);
+      margin-bottom: 10px;
       font-size: 2.2em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+    }
+
+    .logo {
+      width: 80px;
+      height: auto;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: var(--primary-dark);
+      margin-bottom: 30px;
+      font-size: 1.1em;
+      font-weight: 500;
     }
 
     .form-group {
@@ -51,7 +68,7 @@
       display: block;
       margin-bottom: 8px;
       font-weight: 600;
-      color: var(--dark);
+      color: var(--primary-dark);
     }
 
     input, textarea, select {
@@ -59,21 +76,20 @@
       padding: 12px;
       border: 1px solid #ddd;
       border-radius: var(--radius);
-;
       font-size: 16px;
       transition: border-color 0.3s;
     }
 
     input:focus, textarea:focus, select:focus {
-      border-color: var(--secondary);
+      border-color: var(--primary-light);
       outline: none;
-      box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+      box-shadow: 0 0 0 2px rgba(40, 167, 69, 0.2);
     }
 
     button {
       width: 100%;
       padding: 15px;
-      background: var(--secondary);
+      background: var(--primary-light);
       color: white;
       border: none;
       border-radius: var(--radius);
@@ -84,7 +100,7 @@
     }
 
     button:hover {
-      background: #2980b9;
+      background: #218838;
       transform: translateY(-2px);
     }
 
@@ -118,17 +134,19 @@
     }
 
     .btn-location {
-      background: var(--primary);
+      background: var(--primary-dark);
       padding: 10px 15px;
       border-radius: 20px;
       font-size: 14px;
       cursor: pointer;
       margin-top: 10px;
       display: inline-block;
+      color: white;
+      text-decoration: none;
     }
 
     .btn-location:hover {
-      background: #1a252f;
+      background: #004d2c;
     }
 
     .social-preview {
@@ -141,14 +159,21 @@
 
     .social-preview h3 {
       margin-top: 0;
-      color: var(--primary);
+      color: var(--primary-dark);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .social-preview .logo {
+      width: 40px;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>📍 Segnala il tuo Comune</h1>
-    <p style="text-align:center; margin-bottom: 30px;">Hai visto qualcosa da migliorare? Fai una foto, segnala il luogo e aiutaci a renderlo migliore!</p>
+    <h1><img src="https://ivanoruggeri79-collab.github.io/intempolive/logo.png" alt="Logo Paesio" class="logo"> Paesio</h1>
+    <p class="subtitle">Hai visto qualcosa da migliorare? Fai una foto, segnala il luogo e aiutaci a renderlo migliore!</p>
 
     <form id="segnalazione-form" enctype="multipart/form-data">
 
@@ -208,13 +233,13 @@
       </div>
 
       <!-- 7. Invia -->
-      <button type="button" onclick="inviaSegnalazione()">🚀 Invia Segnalazione</button>
+      <button type="submit">🚀 Invia Segnalazione</button>
 
     </form>
 
     <!-- Anteprima social (dopo approvazione) -->
     <div class="social-preview" id="social-preview">
-      <h3>✅ La tua segnalazione sarà pubblicata su Social!</h3>
+      <h3><img src="https://ivanoruggeri79-collab.github.io/intempolive/logo.png" alt="Logo Paesio" class="logo"> ✅ La tua segnalazione sarà pubblicata su Social!</h3>
       <p><strong>Titolo:</strong> <span id="preview-titolo"></span></p>
       <p><strong>Luogo:</strong> <span id="preview-luogo"></span></p>
       <p><strong>Descrizione:</strong> <span id="preview-descrizione"></span></p>
@@ -233,7 +258,6 @@
             const lng = position.coords.longitude;
             document.getElementById('location-info').innerHTML = 
               `📍 Posizione rilevata: Lat ${lat.toFixed(6)}, Lng ${lng.toFixed(6)}`;
-            // Opzionalmente, puoi usare API come Google Maps per convertire in indirizzo
           },
           function(error) {
             alert("Impossibile ottenere la posizione: " + error.message);
@@ -286,45 +310,5 @@
       document.getElementById('social-preview').style.display = 'block';
     });
   </script>
-  <script>
-async function inviaSegnalazione() {
-  const formData = new FormData(document.getElementById('segnalazione-form'));
-
-  try {
-    const response = await fetch('submit.php', {
-      method: 'POST',
-      body: formData
-    });
-
-    const result = await response.json();
-
-    if (result.success) {
-      alert(result.message);
-      
-      // Mostra anteprima social
-      document.getElementById('preview-titolo').textContent = document.getElementById('titolo').value;
-      document.getElementById('preview-luogo').textContent = document.getElementById('luogo').value;
-      document.getElementById('preview-descrizione').textContent = document.getElementById('descrizione').value;
-
-      const media = document.getElementById('media').files[0];
-      if (media) {
-        if (media.type.startsWith('image/')) {
-          document.getElementById('preview-media').innerHTML = `<img src="${URL.createObjectURL(media)}" style="max-width:100%; border-radius:8px;">`;
-        } else if (media.type.startsWith('video/')) {
-          document.getElementById('preview-media').innerHTML = `<video controls style="max-width:100%; border-radius:8px;"><source src="${URL.createObjectURL(media)}"></video>`;
-        }
-      }
-
-      document.getElementById('social-preview').style.display = 'block';
-
-    } else {
-      alert('Errore: ' + result.message);
-    }
-
-  } catch (error) {
-    alert('Errore di rete: ' + error.message);
-  }
-}
-</script>
 </body>
 </html>
