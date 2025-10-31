@@ -1,6 +1,61 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
+  <style>
+  :root {
+    --primary-dark: #00643C;
+    --primary-light: #28A745;
+    --light: #F8F9FA;
+    --white: #FFFFFF;
+    --shadow: 0 4px 12px rgba(0,0,0,0.1);
+    --radius: 12px;
+  }
+
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    color: white;
+    line-height: 1.6;
+  }
+
+  .container {
+    max-width: 800px;
+    margin: 30px auto;
+    padding: 30px;
+    background: rgba(255, 255, 255, 0.95);
+    color: #333;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(10px);
+  }
+
+  h1 {
+    text-align: center;
+    color: var(--primary-dark);
+    margin-bottom: 10px;
+    font-size: 2.2em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+  }
+
+  .logo {
+    width: 80px;
+    height: auto;
+  }
+
+  .subtitle {
+    text-align: center;
+    color: var(--primary-dark);
+    margin-bottom: 30px;
+    font-size: 1.1em;
+    font-weight: 500;
+  }
+</style>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Paesio — Segnala il tuo Comune</title>
@@ -172,8 +227,8 @@
 </head>
 <body>
   <div class="container">
-    <h1><img src="https://ivanoruggeri79-collab.github.io/intempolive/logo.png" alt="Logo Paesio" class="logo"> Paesio</h1>
-    <p class="subtitle">Hai visto qualcosa da migliorare? Fai una foto, segnala il luogo e aiutaci a renderlo migliore!</p>
+    <h1><img src="https://ivanoruggeri79-collab.github.io/paesio/logo.png" alt="Logo Paesio" class="logo"> Paesio</h1>
+<p class="subtitle">Hai visto qualcosa da migliorare? Fai una foto, segnala il luogo e aiutaci a renderlo migliore!</p>
 
     <form id="segnalazione-form" enctype="multipart/form-data">
 
