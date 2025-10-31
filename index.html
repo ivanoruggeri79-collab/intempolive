@@ -238,16 +238,59 @@
     </form>
 
     <!-- Anteprima social (dopo approvazione) -->
-    <div class="social-preview" id="social-preview">
-      <h3><img src="https://ivanoruggeri79-collab.github.io/intempolive/logo.png" alt="Logo Paesio" class="logo"> ✅ La tua segnalazione sarà pubblicata su Social!</h3>
-      <p><strong>Titolo:</strong> <span id="preview-titolo"></span></p>
-      <p><strong>Luogo:</strong> <span id="preview-luogo"></span></p>
-      <p><strong>Descrizione:</strong> <span id="preview-descrizione"></span></p>
-      <div id="preview-media"></div>
-    </div>
+   <!-- Feed Sociale -->
+<div id="social-feed" style="margin-top: 30px; padding: 20px; background: #f1f1f1; border-radius: 10px;">
+  <h2>✅ Le segnalazioni approvate dalla comunità</h2>
+  <div id="social-cards"></div>
+</div>
 
-  </div>
+<script>
+  // Carica le segnalazioni approvate dal tuo server locale (o futuro server)
+  fetch('http://localhost/Paesio/get-social.php') // 👈 Cambia con l'URL del tuo server quando lo carichi su Altervista
+    .then(response => response.json())
+    .then(data => {
+      const feed = document.getElementById('social-cards');
+      if (data.success && data.segnalazioni.length > 0) {
+        data.segnalazioni.forEach(segnalazione => {
+          const card = document.createElement('div');
+          card.style.margin = '15px 0';
+          card.style.padding = '15px';
+          card.style.background = 'white';
+          card.style.borderRadius = '8px';
+          card.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)';
+          card.style.transition = 'transform 0.2s';
 
+          let mediaHtml = '';
+          if (segnalazione.media_path) {
+            if (segnalazione.media_path.endsWith('.mp4') || segnalazione.media_path.endsWith('.webm')) {
+              mediaHtml = `<video controls width="100%"><source src="${segnalazione.media_path}" type="video/mp4"></video>`;
+            } else {
+              mediaHtml = `<img src="${segnalazione.media_path}" alt="Media" style="max-width:100%; border-radius:5px;">`;
+            }
+          }
+
+          card.innerHTML = `
+            <h3 style="color:#00643C; margin:0 0 10px 0;">${segnalazione.titolo}</h3>
+            <p style="color:#555; font-size:0.9em; margin:0 0 10px 0;">📍 ${segnalazione.luogo}</p>
+            <p style="margin:0 0 15px 0;">${segnalazione.descrizione}</p>
+            ${mediaHtml}
+            <p style="color:#777; font-size:0.8em; margin:10px 0 0 0;">
+              Segnalata da ${segnalazione.nome_utente || 'Utente anonimo'} • ${new Date(segnalazione.data_approvazione).toLocaleString()}
+            </p>
+          `;
+
+          feed.appendChild(card);
+        });
+      } else {
+        feed.innerHTML = '<p style="text-align:center; color:#666;">Nessuna segnalazione approvata al momento.</p>';
+      }
+    })
+    .catch(error => {
+      console.error('Errore:', error);
+      document.getElementById('social-cards').innerHTML = '<p style="text-align:center; color:red;">Errore nel caricamento delle segnalazioni.</p>';
+    });
+  
+</script>
   <script>
     // Funzione per ottenere la geolocalizzazione
     function getGeolocation() {
