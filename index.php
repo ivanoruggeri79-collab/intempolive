@@ -2,7 +2,7 @@
 session_start();
 
 // Password hardcoded (per demo — sostituisci con sistema reale!)
-$admin_password = 'miasuperpassword'; // 👈 CAMBIA QUESTA!
+$admin_password = 'Moruccetto0007'; // 👈 CAMBIA QUESTA!
 
 if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['password'])) {
@@ -250,7 +250,7 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
         <div class="stats">
             <?php
             try {
-                $pdo = new PDO("mysql:host=mysql.altervista.org;dbname=NOME_TUO_DB;charset=utf8mb4", 'UTENTE_TUO', 'PASSWORD_TUA');
+                $pdo = new PDO("mysql:host=localhost;dbname=comune_segnalazioni;charset=utf8mb4", 'Paesio_user', 'Moruccetto0007');
                 $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
                 $stmt = $pdo->query("SELECT COUNT(*) as total FROM segnalazioni");
@@ -301,6 +301,86 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
 
         <!-- Tabella segnalazioni -->
         <table>
+		<script>
+function showPreview(id) {
+  // Crea una finestra modale
+  const modal = document.createElement('div');
+  modal.style.position = 'fixed';
+  modal.style.top = '0';
+  modal.style.left = '0';
+  modal.style.width = '100%';
+  modal.style.height = '100%';
+  modal.style.backgroundColor = 'rgba(0,0,0,0.5)';
+  modal.style.display = 'flex';
+  modal.style.alignItems = 'center';
+  modal.style.justifyContent = 'center';
+  modal.style.zIndex = '1000';
+  modal.className = 'modal-overlay';
+
+  // Contenuto della finestra
+  const content = document.createElement('div');
+  content.style.backgroundColor = 'white';
+  content.style.padding = '20px';
+  content.style.borderRadius = '10px';
+  content.style.maxWidth = '800px';
+  content.style.width = '90%';
+  content.style.maxHeight = '80vh';
+  content.style.overflowY = 'auto';
+
+  // Carica i dati della segnalazione
+  fetch(`get-segnalazione.php?id=${id}`)
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        let mediaHtml = '';
+        if (data.segnalazione.media_path) {
+          if (data.segnalazione.media_path.endsWith('.mp4') || data.segnalazione.media_path.endsWith('.webm')) {
+            mediaHtml = `<video controls width="100%"><source src="${data.segnalazione.media_path}" type="video/mp4"></video>`;
+          } else {
+            mediaHtml = `<img src="${data.segnalazione.media_path}" alt="Media" style="max-width:100%; border-radius:8px;">`;
+          }
+        }
+
+        let feedbackHtml = '';
+        if (data.segnalazione.tipo_segnalazione === 'feedback_servizio') {
+          feedbackHtml = `
+            <div style="margin-top:20px; padding:15px; background:#f9f9f9; border-radius:8px;">
+              <h4>?? Feedback su servizio</h4>
+              <p><strong>Impiegato:</strong> ${data.segnalazione.nome_impiegato || 'N/D'}</p>
+              <p><strong>Ente pubblico:</strong> ${data.segnalazione.ente_pubblico || 'N/D'}</p>
+              <p><strong>Feedback:</strong> ${data.segnalazione.feedback || 'N/D'}</p>
+              <p><strong>Commento:</strong> ${data.segnalazione.commento || 'Nessun commento'}</p>
+            </div>
+          `;
+        }
+
+        content.innerHTML = `
+          <h3>??? Anteprima Segnalazione #${data.segnalazione.id}</h3>
+          <p><strong>Titolo:</strong> ${data.segnalazione.titolo}</p>
+          <p><strong>Luogo:</strong> ${data.segnalazione.luogo}</p>
+          <p><strong>Tipo:</strong> ${data.segnalazione.tipo}</p>
+          <p><strong>Tipo segnalazione:</strong> ${data.segnalazione.tipo_segnalazione === 'problema_fisico' ? 'Problema fisico' : 'Feedback su servizio'}</p>
+          <p><strong>Descrizione:</strong> ${data.segnalazione.descrizione}</p>
+          ${mediaHtml}
+          ${feedbackHtml}
+          <p><strong>Data invio:</strong> ${new Date(data.segnalazione.data_invio).toLocaleString()}</p>
+          <p><strong>Stato:</strong> ${data.segnalazione.stato}</p>
+          <div style="margin-top:20px; text-align:center;">
+            <button type="button" onclick="this.closest('.modal-overlay').remove()" style="padding:10px 20px; background:#6c757d; color:white; border:none; border-radius:5px; cursor:pointer;">Chiudi</button>
+          </div>
+        `;
+      } else {
+        content.innerHTML = '<p>Errore nel caricamento dei dati.</p>';
+      }
+    })
+    .catch(error => {
+      content.innerHTML = '<p>Errore di rete.</p>';
+    });
+
+  modal.appendChild(content);
+  document.body.appendChild(modal);
+}
+</script>
             <thead>
                 <tr>
                     <th>ID</th>
@@ -355,21 +435,158 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
                         <td><?php echo htmlspecialchars($row['luogo']); ?></td>
                         <td><?php echo ucfirst($row['tipo']); ?></td>
                         <td><?php echo date('d/m/Y H:i', strtotime($row['data_invio'])); ?></td>
-                        <td><?php echo $media_html; ?></td>
+                       <td>
+  <?php if ($media_html): ?>
+    <a href="javascript:void(0)" onclick="showMediaPreview('<?php echo $row['media_path']; ?>')" style="text-decoration:none; color:#3498db;">
+      <?php echo $media_html; ?>
+    </a>
+  <?php else: ?>
+    Nessun media
+  <?php endif; ?>
+</td>
                         <td><span class="status <?php echo $status_class; ?>"><?php echo ucfirst($row['stato']); ?></span></td>
                         <td class="actions">
-                            <form method="POST" action="approve.php" style="display:inline;">
-                                <input type="hidden" name="id" value="<?php echo $row['id']; ?>">
-                                <button type="submit" name="action" value="approve" class="btn btn-approve">✅ Approva</button>
-                                <button type="submit" name="action" value="reject" class="btn btn-reject">❌ Rifiuta</button>
-                            </form>
-                        </td>
+                         <td>
+						<div style="display:flex; gap:5px;">
+						<button type="button" class="btn btn-view" onclick="showPreview(<?php echo $row['id']; ?>)">??? Dettagli</button>
+						<form method="POST" action="approve.php" style="display:inline;">
+							<input type="hidden" name="id" value="<?php echo $row['id']; ?>">
+							<button type="submit" name="action" value="approve" class="btn btn-approve">? Approva</button>
+							<button type="submit" name="action" value="reject" class="btn btn-reject">? Rifiuta</button>
+						</form>
+					</div>
+				</td>
                     </tr>
                     <?php
                 }
                 ?>
             </tbody>
         </table>
+		<script>
+		function showMediaPreview(mediaPath) {
+  // Crea una finestra modale
+  const modal = document.createElement('div');
+  modal.style.position = 'fixed';
+  modal.style.top = '0';
+  modal.style.left = '0';
+  modal.style.width = '100%';
+  modal.style.height = '100%';
+  modal.style.backgroundColor = 'rgba(0,0,0,0.5)';
+  modal.style.display = 'flex';
+  modal.style.alignItems = 'center';
+  modal.style.justifyContent = 'center';
+  modal.style.zIndex = '1000';
+  modal.className = 'modal-overlay';
+
+  // Contenuto della finestra
+  const content = document.createElement('div');
+  content.style.backgroundColor = 'white';
+  content.style.padding = '20px';
+  content.style.borderRadius = '10px';
+  content.style.maxWidth = '800px';
+  content.style.width = '90%';
+  content.style.maxHeight = '80vh';
+  content.style.overflowY = 'auto';
+
+  // Anteprima del media
+  let mediaHtml = '';
+  if (mediaPath.endsWith('.mp4') || mediaPath.endsWith('.webm')) {
+    mediaHtml = `<video controls width="100%"><source src="${mediaPath}" type="video/mp4"></video>`;
+  } else {
+    mediaHtml = `<img src="${mediaPath}" alt="Media" style="max-width:100%; border-radius:8px;">`;
+  }
+
+  content.innerHTML = `
+    <h3>??? Anteprima Media</h3>
+    ${mediaHtml}
+    <div style="margin-top:20px; text-align:center;">
+     <button type="button" onclick="this.closest('.modal-overlay').remove()" style="padding:10px 20px; background:#6c757d; color:white; border:none; border-radius:5px; cursor:pointer;">Chiudi</button>
+    </div>
+  `;
+
+  modal.appendChild(content);
+  document.body.appendChild(modal);
+}
+</script>
+function showPreview(id) {
+  // Crea una finestra modale
+  const modal = document.createElement('div');
+  modal.style.position = 'fixed';
+  modal.style.top = '0';
+  modal.style.left = '0';
+  modal.style.width = '100%';
+  modal.style.height = '100%';
+  modal.style.backgroundColor = 'rgba(0,0,0,0.5)';
+  modal.style.display = 'flex';
+  modal.style.alignItems = 'center';
+  modal.style.justifyContent = 'center';
+  modal.style.zIndex = '1000';
+  modal.className = 'modal-overlay';
+
+  // Contenuto della finestra
+  const content = document.createElement('div');
+  content.style.backgroundColor = 'white';
+  content.style.padding = '20px';
+  content.style.borderRadius = '10px';
+  content.style.maxWidth = '800px';
+  content.style.width = '90%';
+  content.style.maxHeight = '80vh';
+  content.style.overflowY = 'auto';
+
+  // Carica i dati della segnalazione
+  fetch(`get-segnalazione.php?id=${id}`)
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        let mediaHtml = '';
+        if (data.segnalazione.media_path) {
+          if (data.segnalazione.media_path.endsWith('.mp4') || data.segnalazione.media_path.endsWith('.webm')) {
+            mediaHtml = `<video controls width="100%"><source src="${data.segnalazione.media_path}" type="video/mp4"></video>`;
+          } else {
+            mediaHtml = `<img src="${data.segnalazione.media_path}" alt="Media" style="max-width:100%; border-radius:8px;">`;
+          }
+        }
+
+        let feedbackHtml = '';
+        if (data.segnalazione.tipo_segnalazione === 'feedback_servizio') {
+          feedbackHtml = `
+            <div style="margin-top:20px; padding:15px; background:#f9f9f9; border-radius:8px;">
+              <h4>?? Feedback su servizio</h4>
+              <p><strong>Impiegato:</strong> ${data.segnalazione.nome_impiegato || 'N/D'}</p>
+              <p><strong>Ente pubblico:</strong> ${data.segnalazione.ente_pubblico || 'N/D'}</p>
+              <p><strong>Feedback:</strong> ${data.segnalazione.feedback || 'N/D'}</p>
+              <p><strong>Commento:</strong> ${data.segnalazione.commento || 'Nessun commento'}</p>
+            </div>
+          `;
+        }
+
+        content.innerHTML = `
+          <h3>??? Anteprima Segnalazione #${data.segnalazione.id}</h3>
+          <p><strong>Titolo:</strong> ${data.segnalazione.titolo}</p>
+          <p><strong>Luogo:</strong> ${data.segnalazione.luogo}</p>
+          <p><strong>Tipo:</strong> ${data.segnalazione.tipo}</p>
+          <p><strong>Tipo segnalazione:</strong> ${data.segnalazione.tipo_segnalazione === 'problema_fisico' ? 'Problema fisico' : 'Feedback su servizio'}</p>
+          <p><strong>Descrizione:</strong> ${data.segnalazione.descrizione}</p>
+          ${mediaHtml}
+          ${feedbackHtml}
+          <p><strong>Data invio:</strong> ${new Date(data.segnalazione.data_invio).toLocaleString()}</p>
+          <p><strong>Stato:</strong> ${data.segnalazione.stato}</p>
+          <div style="margin-top:20px; text-align:center;">
+            <button type="button" onclick="document.querySelector('.modal-overlay').remove()" style="padding:10px 20px; background:#6c757d; color:white; border:none; border-radius:5px; cursor:pointer;">Chiudi</button>
+          </div>
+        `;
+      } else {
+        content.innerHTML = '<p>Errore nel caricamento dei dati.</p>';
+      }
+    })
+    .catch(error => {
+      content.innerHTML = '<p>Errore di rete.</p>';
+    });
+
+  modal.appendChild(content);
+  document.body.appendChild(modal);
+}
+</script>
 
         <footer>
             <p>© 2025 Paesio — Pannello Amministratore</p>
