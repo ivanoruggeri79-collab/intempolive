@@ -1,0 +1,9 @@
+:root {
+  --primary-dark: #00643C;    /* Verde scuro del logo */
+  --primary-light: #28A745;   /* Verde chiaro del logo */
+  --accent: #FF6B6B;          /* Arancione acceso per azioni importanti */
+  --light: #F8F9FA;           /* Sfondo chiaro */
+  --white: #FFFFFF;
+  --shadow: 0 4px 12px rgba(0,0,0,0.1);
+  --radius: 12px;
+}

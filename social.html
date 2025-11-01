@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Feed Sociale — Paesio</title>
+  <style>
+    :root {
+      --primary-dark: #00643C;
+      --primary-light: #28A745;
+      --light: #F8F9FA;
+      --white: #FFFFFF;
+      --shadow: 0 4px 12px rgba(0,0,0,0.1);
+      --radius: 12px;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      color: white;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 30px auto;
+      padding: 30px;
+      background: rgba(255, 255, 255, 0.95);
+      color: #333;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+    }
+
+    h1 {
+      text-align: center;
+      color: var(--primary-dark);
+      margin-bottom: 10px;
+      font-size: 2.2em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+    }
+
+    .logo {
+      width: 80px;
+      height: auto;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: var(--primary-dark);
+      margin-bottom: 30px;
+      font-size: 1.1em;
+      font-weight: 500;
+    }
+
+    .card {
+      background: white;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 20px;
+      margin-bottom: 20px;
+      transition: transform 0.2s;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .card-title {
+      font-size: 1.3em;
+      color: var(--primary-dark);
+      margin: 0;
+    }
+
+    .card-user {
+      color: #666;
+      font-size: 0.9em;
+    }
+
+    .card-location {
+      color: #555;
+      font-size: 0.9em;
+      margin: 10px 0;
+    }
+
+    .card-description {
+      margin: 15px 0;
+      line-height: 1.5;
+    }
+
+    .card-media {
+      margin: 15px 0;
+      text-align: center;
+    }
+
+    .card-media img {
+      max-width: 100%;
+      max-height: 300px;
+      border-radius: var(--radius);
+      object-fit: cover;
+    }
+
+    .card-media video {
+      max-width: 100%;
+      max-height: 300px;
+      border-radius: var(--radius);
+    }
+
+    .card-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 15px;
+      padding-top: 15px;
+      border-top: 1px solid #eee;
+      font-size: 0.9em;
+      color: #777;
+    }
+
+    .btn-like {
+      background: var(--primary-light);
+      color: white;
+      border: none;
+      border-radius: 20px;
+      padding: 5px 15px;
+      cursor: pointer;
+      font-size: 0.9em;
+    }
+
+    .btn-like:hover {
+      background: #218838;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1><img src="https://ivanoruggeri79-collab.github.io/intempolive/logo.png" alt="Logo Paesio" class="logo"> Paesio</h1>
+    <p class="subtitle">Le segnalazioni approvate dalla comunità</p>
+
+    <div id="social-feed">
+      <!-- Le segnalazioni verranno caricate qui -->
+    </div>
+
+  </div>
+
+  <script>
+    // Carica le segnalazioni approvate
+    fetch('get-social.php')
+      .then(response => response.json())
+      .then(data => {
+        const feed = document.getElementById('social-feed');
+        if (data.success && data.segnalazioni.length > 0) {
+          data.segnalazioni.forEach(segnalazione => {
+            const card = document.createElement('div');
+            card.className = 'card';
+
+            let mediaHtml = '';
+            if (segnalazione.media_path) {
+              if (segnalazione.media_path.endsWith('.mp4') || segnalazione.media_path.endsWith('.webm')) {
+                mediaHtml = `<video controls width="100%"><source src="${segnalazione.media_path}" type="video/mp4"></video>`;
+              } else {
+                mediaHtml = `<img src="${segnalazione.media_path}" alt="Media">`;
+              }
+            }
+
+            card.innerHTML = `
+              <div class="card-header">
+  <h3 class="card-title">${segnalazione.titolo}</h3>
+  <span class="card-user">Segnalata da ${segnalazione.nome_utente || 'Utente anonimo'}</span>
+</div>
+<div class="card-type">
+  <strong>Tipo:</strong> ${segnalazione.tipo_segnalazione === 'problema_fisico' ? 'Problema fisico' : 'Feedback su servizio'}
+</div>
+              <div class="card-location">📍 ${segnalazione.luogo}</div>
+              <div class="card-description">${segnalazione.descrizione}</div>
+			  ${segnalazione.tipo_segnalazione === 'feedback_servizio' ? `
+  <div class="card-feedback">
+    <strong>Impiegato:</strong> ${segnalazione.nome_impiegato || 'N/D'}<br>
+    <strong>Ente:</strong> ${segnalazione.ente_pubblico || 'N/D'}<br>
+    <strong>Feedback:</strong> ${segnalazione.feedback || 'N/D'}<br>
+    <strong>Commento:</strong> ${segnalazione.commento || 'Nessun commento'}
+  </div>
+` : ''}
+              <div class="card-media">${mediaHtml}</div>
+              <div class="card-footer">
+                <span>${new Date(segnalazione.data_approvazione).toLocaleString()}</span>
+                <button class="btn-like" data-id="${segnalazione.id}" onclick="likeSeGNALAZIONE(this)">❤️ Mi piace (<span id="like-count-${segnalazione.id}">${segnalazione.likes || 0}</span>)</button>
+              </div>
+            `;
+
+            feed.appendChild(card);
+          });
+        } else {
+          feed.innerHTML = '<p style="text-align:center; color:#666;">Nessuna segnalazione approvata al momento.</p>';
+        }
+      })
+      .catch(error => {
+        console.error('Errore:', error);
+        document.getElementById('social-feed').innerHTML = '<p style="text-align:center; color:red;">Errore nel caricamento delle segnalazioni.</p>';
+      });
+  </script>
+  <script>
+// Funzione per votare una segnalazione
+function likeSeGNALAZIONE(button) {
+  const id = button.dataset.id;
+  const countElement = document.getElementById(`like-count-${id}`);
+
+  fetch('like.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ id: parseInt(id) })
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      countElement.textContent = data.likes;
+      button.disabled = true;
+      button.style.opacity = '0.6';
+      button.textContent = '❤️ Mi piace (Già votato)';
+    } else {
+      alert('Errore: ' + data.message);
+    }
+  })
+  .catch(error => {
+    console.error('Errore:', error);
+    alert('Errore di rete');
+  });
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Paesio — Segnala il tuo Comune</title>
+  <style>
+    :root {
+      --primary-dark: #00643C;
+      --primary-light: #28A745;
+      --accent: #FF6B6B;
+      --light: #F8F9FA;
+      --white: #FFFFFF;
+      --shadow: 0 4px 12px rgba(0,0,0,0.1);
+      --radius: 12px;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      color: white;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 30px auto;
+      padding: 30px;
+      background: rgba(255, 255, 255, 0.95);
+      color: #333;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+    }
+
+    h1 {
+      text-align: center;
+      color: var(--primary-dark);
+      margin-bottom: 10px;
+      font-size: 2.2em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+    }
+
+    .logo {
+      width: 80px;
+      height: auto;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: var(--primary-dark);
+      margin-bottom: 30px;
+      font-size: 1.1em;
+      font-weight: 500;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: var(--primary-dark);
+    }
+
+    input, textarea, select {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: var(--radius);
+      font-size: 16px;
+      transition: border-color 0.3s;
+    }
+
+    input:focus, textarea:focus, select:focus {
+      border-color: var(--primary-light);
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(40, 167, 69, 0.2);
+    }
+
+    button {
+      width: 100%;
+      padding: 15px;
+      background: var(--primary-light);
+      color: white;
+      border: none;
+      border-radius: var(--radius);
+      font-size: 18px;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.2s;
+      font-weight: bold;
+    }
+
+    button:hover {
+      background: #218838;
+      transform: translateY(-2px);
+    }
+
+    .preview-container {
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    .preview-img {
+      max-width: 100%;
+      max-height: 300px;
+      border-radius: var(--radius);
+      border: 2px dashed #ccc;
+      display: none;
+    }
+
+    .preview-video {
+      max-width: 100%;
+      max-height: 300px;
+      border-radius: var(--radius);
+      display: none;
+    }
+
+    .location-info {
+      background: #f8f9fa;
+      padding: 15px;
+      border-radius: var(--radius);
+      margin-top: 10px;
+      font-size: 14px;
+      color: #555;
+    }
+
+    .btn-location {
+      background: var(--primary-dark);
+      padding: 10px 15px;
+      border-radius: 20px;
+      font-size: 14px;
+      cursor: pointer;
+      margin-top: 10px;
+      display: inline-block;
+      color: white;
+      text-decoration: none;
+    }
+
+    .btn-location:hover {
+      background: #004d2c;
+    }
+
+    .social-preview {
+      margin-top: 30px;
+      padding: 20px;
+      background: #f1f1f1;
+      border-radius: var(--radius);
+      display: none;
+    }
+
+    .social-preview h3 {
+      margin-top: 0;
+      color: var(--primary-dark);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .social-preview .logo {
+      width: 40px;
+    }
+	<script>
+// Controlla se l'utente è loggato
+fetch('check-login.php')
+  .then(response => response.json())
+  .then(data => {
+    if (data.logged_in) {
+      // Mostra il nome dell'utente
+      const userDisplay = document.createElement('div');
+      userDisplay.innerHTML = `<p style="text-align:center; color:#00643C; font-weight:bold;">Benvenuto, ${data.nome_completo}!</p>`;
+      document.querySelector('.container').insertBefore(userDisplay, document.getElementById('segnalazione-form'));
+
+      // Nascondi i campi nome/email (opzionale)
+      document.getElementById('nome').closest('.form-group').style.display = 'none';
+      document.getElementById('email').closest('.form-group').style.display = 'none';
+
+      // Aggiungi un campo nascosto con l'utente_id
+      const userIdInput = document.createElement('input');
+      userIdInput.type = 'hidden';
+      userIdInput.name = 'utente_id';
+      userIdInput.value = data.user_id;
+      document.getElementById('segnalazione-form').appendChild(userIdInput);
+
+    } else {
+      // Mostra link di login/registrazione
+      const loginLink = document.createElement('div');
+      loginLink.innerHTML = `<p style="text-align:center;"><a href="login.html">Accedi</a> o <a href="register.html">Registrati</a> per segnalare come utente.</p>`;
+      document.querySelector('.container').insertBefore(loginLink, document.getElementById('segnalazione-form'));
+    }
+  })
+  .catch(error => console.error('Errore:', error));
+</script>
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1><img src="https://ivanoruggeri79-collab.github.io/paesio/logo.png" alt="Logo Paesio" class="logo"> Paesio</h1>
+    <p class="subtitle">Hai visto qualcosa da migliorare? Fai una foto, segnala il luogo e aiutaci a renderlo migliore!</p>
+
+    <form id="segnalazione-form" enctype="multipart/form-data">
+
+      <!-- Tipo di segnalazione -->
+<div class="form-group">
+  <label for="tipo_segnalazione">Tipo di segnalazione</label>
+  <select id="tipo_segnalazione" name="tipo_segnalazione">
+    <option value="problema_fisico">Problema fisico (strade, panchine, illuminazione...)</option>
+    <option value="feedback_servizio">Feedback su servizio o impiegato</option>
+  </select>
+</div>
+
+<!-- Nome impiegato (opzionale) -->
+<div class="form-group" id="nome_impiegato_group" style="display:none;">
+  <label for="nome_impiegato">Nome dell'impiegato (opzionale)</label>
+  <input type="text" id="nome_impiegato" name="nome_impiegato" placeholder="Es: Mario Rossi">
+</div>
+
+<!-- Ente pubblico -->
+<div class="form-group" id="ente_pubblico_group" style="display:none;">
+  <label for="ente_pubblico">Ente pubblico</label>
+  <select id="ente_pubblico" name="ente_pubblico">
+    <option value="">Seleziona...</option>
+    <option value="comune">Comune</option>
+    <option value="ospedale">Ospedale</option>
+    <option value="scuola">Scuola</option>
+    <option value="ufficio_postale">Ufficio postale</option>
+    <option value="altro">Altro</option>
+  </select>
+</div>
+
+<!-- Feedback -->
+<div class="form-group" id="feedback_group" style="display:none;">
+  <label for="feedback">Feedback</label>
+  <select id="feedback" name="feedback">
+    <option value="">Seleziona...</option>
+    <option value="positivo">Positivo</option>
+    <option value="negativo">Negativo</option>
+    <option value="neutro">Neutro</option>
+  </select>
+</div>
+
+<!-- Commento -->
+<div class="form-group" id="commento_group" style="display:none;">
+  <label for="commento">Commento dettagliato</label>
+  <textarea id="commento" name="commento" rows="4" placeholder="Descrivi la tua esperienza..."></textarea>
+</div>
+
+<!-- 1. Titolo della segnalazione -->
+      <div class="form-group">
+        <label for="titolo">Titolo della segnalazione *</label>
+        <input type="text" id="titolo" name="titolo" required placeholder="Es: Panchina rotta in piazza XXIV Maggio">
+      </div>
+
+      <!-- 2. Descrizione -->
+      <div class="form-group">
+        <label for="descrizione">Descrizione dettagliata *</label>
+        <textarea id="descrizione" name="descrizione" rows="4" required placeholder="Cosa è successo? Quando? Cosa vorresti fosse fatto?"></textarea>
+      </div>
+
+      <!-- 3. Luogo (geolocalizzazione o manuale) -->
+      <div class="form-group">
+        <label for="luogo">Dove è accaduto?</label>
+        <input type="text" id="luogo" name="luogo" placeholder="Indirizzo, piazza, via..." required>
+        <button type="button" class="btn-location" onclick="getGeolocation()">📍 Usa la mia posizione</button>
+        <div class="location-info" id="location-info">Posizione non ancora rilevata.</div>
+      </div>
+
+      <!-- 4. Tipo di segnalazione -->
+      <div class="form-group">
+        <label for="tipo">Tipo di segnalazione</label>
+        <select id="tipo" name="tipo">
+          <option value="">Seleziona...</option>
+          <option value="strade">Strade / marciapiedi</option>
+          <option value="illuminazione">Illuminazione</option>
+          <option value="verde">Aree verdi / giardini</option>
+          <option value="spazzatura">Rifiuti / pulizia</option>
+          <option value="sicurezza">Sicurezza / videosorveglianza</option>
+          <option value="altro">Altro</option>
+        </select>
+      </div>
+
+      <!-- 5. Carica Foto o Video -->
+      <div class="form-group">
+        <label for="media">Carica una foto o un video *</label>
+        <input type="file" id="media" name="media" accept="image/*,video/*" required onchange="previewMedia(event)">
+        <div class="preview-container">
+          <img id="preview-img" class="preview-img" alt="Anteprima immagine">
+          <video id="preview-video" class="preview-video" controls></video>
+        </div>
+      </div>
+
+      <!-- 6. Dati utente (opzionali ma utili) -->
+      <div class="form-group">
+        <label for="nome">Il tuo nome (opzionale)</label>
+        <input type="text" id="nome" name="nome" placeholder="Come ti chiami?">
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email (opzionale - per contattarti)</label>
+        <input type="email" id="email" name="email" placeholder="email@esempio.com">
+      </div>
+
+      <!-- 7. Invia -->
+      <button type="button" onclick="inviaSegnalazione()">🚀 Invia Segnalazione</button>
+
+    </form>
+
+    <!-- Anteprima social (dopo approvazione) -->
+    <div class="social-preview" id="social-preview">
+      <h3><img src="https://ivanoruggeri79-collab.github.io/paesio/logo.png" alt="Logo Paesio" class="logo"> ✅ La tua segnalazione sarà pubblicata su Social!</h3>
+      <p><strong>Titolo:</strong> <span id="preview-titolo"></span></p>
+      <p><strong>Luogo:</strong> <span id="preview-luogo"></span></p>
+      <p><strong>Descrizione:</strong> <span id="preview-descrizione"></span></p>
+      <div id="preview-media"></div>
+    </div>
+
+  </div>
+
+  <script>
+    // Funzione per ottenere la geolocalizzazione
+    function getGeolocation() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          function(position) {
+            const lat = position.coords.latitude;
+            const lng = position.coords.longitude;
+            document.getElementById('location-info').innerHTML = 
+              `📍 Posizione rilevata: Lat ${lat.toFixed(6)}, Lng ${lng.toFixed(6)}`;
+          },
+          function(error) {
+            alert("Impossibile ottenere la posizione: " + error.message);
+          }
+        );
+      } else {
+        alert("Geolocalizzazione non supportata dal browser.");
+      }
+    }
+
+    // Anteprima media (foto o video)
+    function previewMedia(event) {
+      const file = event.target.files[0];
+      const imgPreview = document.getElementById('preview-img');
+      const videoPreview = document.getElementById('preview-video');
+      
+      imgPreview.style.display = 'none';
+      videoPreview.style.display = 'none';
+
+      if (file) {
+        if (file.type.startsWith('image/')) {
+          imgPreview.src = URL.createObjectURL(file);
+          imgPreview.style.display = 'block';
+        } else if (file.type.startsWith('video/')) {
+          videoPreview.src = URL.createObjectURL(file);
+          videoPreview.style.display = 'block';
+        }
+      }
+    }
+
+    // Gestione invio form
+    async function inviaSegnalazione() {
+      const formData = new FormData(document.getElementById('segnalazione-form'));
+
+      try {
+        const response = await fetch('submit.php', {
+          method: 'POST',
+          body: formData
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          alert(result.message);
+          
+          // Mostra anteprima social
+          document.getElementById('preview-titolo').textContent = document.getElementById('titolo').value;
+          document.getElementById('preview-luogo').textContent = document.getElementById('luogo').value;
+          document.getElementById('preview-descrizione').textContent = document.getElementById('descrizione').value;
+
+          const media = document.getElementById('media').files[0];
+          if (media) {
+            if (media.type.startsWith('image/')) {
+              document.getElementById('preview-media').innerHTML = `<img src="${URL.createObjectURL(media)}" style="max-width:100%; border-radius:8px;">`;
+            } else if (media.type.startsWith('video/')) {
+              document.getElementById('preview-media').innerHTML = `<video controls style="max-width:100%; border-radius:8px;"><source src="${URL.createObjectURL(media)}"></video>`;
+            }
+          }
+
+          document.getElementById('social-preview').style.display = 'block';
+
+        } else {
+          alert('Errore: ' + result.message);
+        }
+
+      } catch (error) {
+        alert('Errore di rete: ' + error.message);
+      }
+    }
+
+    
+// Mostra/nasconde i campi in base al tipo di segnalazione
+document.getElementById('tipo_segnalazione').addEventListener('change', function() {
+  const tipo = this.value;
+  const nomeImpiegatoGroup = document.getElementById('nome_impiegato_group');
+  const entePubblicoGroup = document.getElementById('ente_pubblico_group');
+  const feedbackGroup = document.getElementById('feedback_group');
+  const commentoGroup = document.getElementById('commento_group');
+
+  if (tipo === 'feedback_servizio') {
+    nomeImpiegatoGroup.style.display = 'block';
+    entePubblicoGroup.style.display = 'block';
+    feedbackGroup.style.display = 'block';
+    commentoGroup.style.display = 'block';
+  } else {
+    nomeImpiegatoGroup.style.display = 'none';
+    entePubblicoGroup.style.display = 'none';
+    feedbackGroup.style.display = 'none';
+    commentoGroup.style.display = 'none';
+  }
+});
+// Controlla se l'utente è loggato
+    fetch('check-login.php')
+      .then(response => response.json())
+      .then(data => {
+        if (data.logged_in) {
+          // Mostra il nome dell'utente
+          const userDisplay = document.createElement('div');
+          userDisplay.innerHTML = `<p style="text-align:center; color:#00643C; font-weight:bold;">Benvenuto, ${data.nome_completo}!</p>`;
+          document.querySelector('.container').insertBefore(userDisplay, document.getElementById('segnalazione-form'));
+
+          // Nascondi i campi nome/email (opzionale)
+          document.getElementById('nome').closest('.form-group').style.display = 'none';
+          document.getElementById('email').closest('.form-group').style.display = 'none';
+
+          // Aggiungi un campo nascosto con l'utente_id
+          const userIdInput = document.createElement('input');
+          userIdInput.type = 'hidden';
+          userIdInput.name = 'utente_id';
+          userIdInput.value = data.user_id;
+          document.getElementById('segnalazione-form').appendChild(userIdInput);
+
+        } else {
+          // Mostra link di login/registrazione
+          const loginLink = document.createElement('div');
+          loginLink.innerHTML = `<p style="text-align:center;"><a href="login.html">Accedi</a> o <a href="register.html">Registrati</a> per segnalare come utente.</p>`;
+          document.querySelector('.container').insertBefore(loginLink, document.getElementById('segnalazione-form'));
+        }
+      })
+      .catch(error => console.error('Errore:', error));
+  </script>
+</body>
+</html>
